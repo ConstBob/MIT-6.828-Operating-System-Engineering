@@ -41,13 +41,13 @@ int sys_sbrk(void)
 {
   int addr;
   int n;
-
   if (argint(0, &n) < 0)
     return -1;
   addr = myproc()->sz;
-  if (growproc(n) < 0)
-    return -1;
-  return addr;
+  myproc()->sz += n; // Increment the process's size (proc->sz) by n
+  // if (growproc(n) < 0)
+  //   return -1;
+  return addr; //Return the old size
 }
 
 int sys_sleep(void)
@@ -86,8 +86,8 @@ int sys_uptime(void)
 
 int sys_date(void)
 {
-  struct rtcdate* prtc = 0; // Declare a pointer to struct rtcdate
-  if (argptr(0, (char **)&prtc, sizeof(*prtc) < 0)) //Assign value to the pointer
+  struct rtcdate *prtc = 0;                         // Declare a pointer to struct rtcdate
+  if (argptr(0, (char **)&prtc, sizeof(*prtc) < 0)) // Assign value to the pointer
     return -1;
   cmostime(prtc); // Use prtc as the parameter of cmostime
   return 0;
