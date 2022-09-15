@@ -56,6 +56,27 @@ void trap(struct trapframe *tf)
       wakeup(&ticks);
       release(&tickslock);
     }
+    // Manipulate a process's alarm ticks
+    // if there's a process running and
+    // if the timer interrupt came from user space
+    if (myproc() && (tf->cs & 3) == 3)
+    {
+      if (myproc()->alarmticks)
+      {
+        myproc()->alarmticksleft--; // Count the ticks left
+        if (myproc()->alarmticksleft == 0)
+        {
+          // Decrease the stack pointer
+          tf->esp -= 4; 
+          // Push %eip into user stack
+          *(uint *)(tf->esp) = tf->eip; 
+          //Set %eip to address of handler
+          tf->eip = (uint)(myproc()->alarmhandler); 
+          // Reset the ticks left
+          myproc()->alarmticksleft = myproc()->alarmticks; 
+        }
+      }
+    }
     lapiceoi();
     break;
   case T_IRQ0 + IRQ_IDE:

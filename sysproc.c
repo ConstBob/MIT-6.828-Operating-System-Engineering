@@ -47,7 +47,7 @@ int sys_sbrk(void)
   myproc()->sz += n; // Increment the process's size (proc->sz) by n
   // if (growproc(n) < 0)
   //   return -1;
-  return addr; //Return the old size
+  return addr; // Return the old size
 }
 
 int sys_sleep(void)
@@ -90,5 +90,19 @@ int sys_date(void)
   if (argptr(0, (char **)&prtc, sizeof(*prtc) < 0)) // Assign value to the pointer
     return -1;
   cmostime(prtc); // Use prtc as the parameter of cmostime
+  return 0;
+}
+
+int sys_alarm(void)
+{
+  int ticks;
+  void (*handler)();
+  if (argint(0, &ticks) < 0)
+    return -1;
+  if (argptr(1, (char **)&handler, 1) < 0)
+    return -1;
+  myproc()->alarmticks = ticks;
+  myproc()->alarmhandler = handler;
+  myproc()->alarmticksleft = myproc()->alarmticks;
   return 0;
 }
