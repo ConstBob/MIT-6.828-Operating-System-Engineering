@@ -116,7 +116,7 @@ void trap(struct trapframe *tf)
     uint newsz = myproc()->sz;
     uint oldsz = myproc()->tf->eax;
     pde_t *pgdir = myproc()->pgdir;
-    a = PGROUNDUP(oldsz);
+    a = PGROUNDDOWN(rcr2());
     for (; a < newsz; a += PGSIZE)
     {
       mem = kalloc();
