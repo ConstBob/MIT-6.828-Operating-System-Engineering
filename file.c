@@ -9,6 +9,7 @@
 #include "spinlock.h"
 #include "sleeplock.h"
 #include "file.h"
+#include "x86.h"
 
 struct devsw devsw[NDEV];
 struct {
@@ -27,15 +28,17 @@ struct file*
 filealloc(void)
 {
   struct file *f;
-
   acquire(&ftable.lock);
+  sti();
   for(f = ftable.file; f < ftable.file + NFILE; f++){
     if(f->ref == 0){
       f->ref = 1;
+      cli();
       release(&ftable.lock);
       return f;
     }
   }
+  cli();
   release(&ftable.lock);
   return 0;
 }

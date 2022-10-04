@@ -148,6 +148,8 @@ iderw(struct buf *b)
 
   acquire(&idelock);  //DOC:acquire-lock
 
+  // sti(); // Added
+
   // Append b to idequeue.
   b->qnext = 0;
   for(pp=&idequeue; *pp; pp=&(*pp)->qnext)  //DOC:insert-queue
@@ -163,6 +165,7 @@ iderw(struct buf *b)
     sleep(b, &idelock);
   }
 
+  // cli(); // Added
 
   release(&idelock);
 }
